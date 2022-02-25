@@ -3,6 +3,8 @@
 namespace common\models;
 
 use Yii;
+use yii\behaviors\BlameableBehavior;
+use yii\behaviors\TimestampBehavior;
 
 /**
  * This is the model class for table "{{%products}}".
@@ -22,12 +24,27 @@ use Yii;
  */
 class Product extends \yii\db\ActiveRecord
 {
+
+    const STATUS_DRAFT = 0;
+    const STATUS_PUBLISHED = 1;
+
     /**
      * {@inheritdoc}
      */
     public static function tableName()
     {
         return '{{%products}}';
+    }
+
+    public function behaviors()
+    {
+        return [
+            TimestampBehavior::class,
+            [
+                'class' => BlameableBehavior::class,
+                //'updatedByAttribute' => false
+            ]
+        ];
     }
 
     /**
@@ -42,8 +59,9 @@ class Product extends \yii\db\ActiveRecord
             [['product_id'], 'string', 'max' => 16],
             [['title'], 'string', 'max' => 255],
             [['product_id'], 'unique'],
+            ['rank', 'default', 'value' => 0],
+            ['isActive', 'default', 'value' => self::STATUS_DRAFT],
             [['created_by'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['created_by' => 'id']],
-            [['updated_by'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['updated_by' => 'id']],
         ];
     }
 
@@ -63,6 +81,14 @@ class Product extends \yii\db\ActiveRecord
             'created_by' => 'Created By',
             'updated_by' => 'Updated By',
         ];
+    }
+
+    public function getStatusLabels(){
+        return [
+            self::STATUS_DRAFT => 'Draft',
+            self::STATUS_PUBLISHED => 'Published',
+        ];
+
     }
 
     /**
@@ -92,5 +118,22 @@ class Product extends \yii\db\ActiveRecord
     public static function find()
     {
         return new \common\models\query\ProductQuery(get_called_class());
+    }
+
+    public function save($runValidation = true, $attributeNames = null)
+    {
+        $isInsert = $this->isNewRecord;
+
+        if($isInsert){
+            $this->product_id = Yii::$app->security->generateRandomString(8);
+            //$this->title = $this->title;
+        }
+
+        $saved = parent::save($runValidation, $attributeNames);
+        if(!$saved){
+            return false;
+        }
+
+        return true;
     }
 }

@@ -16,8 +16,8 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
-        <?= Html::a('Update', ['update', 'product_id' => $model->product_id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Delete', ['delete', 'product_id' => $model->product_id], [
+        <?= Html::a('<i class="fa fa-pencil-square-o p-r-xs"></i>Update', ['update', 'product_id' => $model->product_id], ['class' => 'btn btn-info']) ?>
+        <?= Html::a('<i class="fa fa-trash p-r-xs"></i>Delete', ['delete', 'product_id' => $model->product_id], [
             'class' => 'btn btn-danger',
             'data' => [
                 'confirm' => 'Are you sure you want to delete this item?',
@@ -28,16 +28,39 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?= DetailView::widget([
         'model' => $model,
+        'options' => [
+            'class' => 'table table-striped bg-white table-bordered',
+            //'data-plugin' => 'DataTable',
+        ],
         'attributes' => [
             'product_id',
             'title',
-            'description:ntext',
-            'rank',
-            'isActive',
-            'created_at',
-            'updated_at',
-            'created_by',
-            'updated_by',
+            [
+                'label' => 'Description',
+                'attribute' => 'description',
+                'format' => 'html',
+                'value' => function ($model) {
+                    /** @var \common\models\Product $model */
+                    //return Html::tag('span', $model->getStatusLabels()[$model->isActive]);
+                    return Html::encode(strip_tags($model->description));
+                }
+            ],
+            //'rank',
+            [
+                'label' => 'Status',
+                'attribute' => 'isActive',
+                'format' => 'html',
+                'value' => function ($model) {
+                    /** @var \common\models\Product $model */
+                    return Html::tag('span', $model->getStatusLabels()[$model->isActive], [
+                        'class' => $model->isActive ? 'badge badge-success' : 'badge badge-danger'
+                    ]);
+                }
+            ],
+            'created_at:datetime',
+            'updated_at:datetime',
+            'createdBy.username',
+            'updatedBy.username',
         ],
     ]) ?>
 

@@ -18,7 +18,7 @@ AppAsset::register($this);
     <?php $this->registerCsrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
     <?php $this->head() ?>
-    <script src="libs/bower/breakpoints.js/dist/breakpoints.min.js"></script>
+    <script src="/libs/bower/breakpoints.js/dist/breakpoints.min.js"></script>
     <script>
         Breakpoints();
     </script>

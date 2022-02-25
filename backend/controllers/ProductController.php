@@ -4,6 +4,7 @@ namespace backend\controllers;
 
 use common\models\Product;
 use backend\models\search\ProductSearch;
+use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -21,6 +22,16 @@ class ProductController extends Controller
         return array_merge(
             parent::behaviors(),
             [
+                'access' => [
+                    'class' => AccessControl::class,
+                    'rules' => [
+                        [
+                            'actions' => ['index', 'view', 'update', 'create', 'delete'],
+                            'allow' => true,
+                            'roles' => ['@'],
+                        ],
+                    ],
+                ],
                 'verbs' => [
                     'class' => VerbFilter::className(),
                     'actions' => [
@@ -40,6 +51,12 @@ class ProductController extends Controller
     {
         $searchModel = new ProductSearch();
         $dataProvider = $searchModel->search($this->request->queryParams);
+
+        // set default sorting
+        $dataProvider->sort->defaultOrder = ['created_at' => SORT_DESC];
+
+        // set default pageSize
+        $dataProvider->pagination->pageSize = 2;
 
         return $this->render('index', [
             'searchModel' => $searchModel,
