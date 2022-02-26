@@ -4,10 +4,15 @@ namespace backend\controllers;
 
 use common\models\Product;
 use backend\models\search\ProductSearch;
+use common\models\ProductImage;
+use Yii;
+use yii\base\BaseObject;
 use yii\filters\AccessControl;
+use yii\helpers\FileHelper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\UploadedFile;
 
 /**
  * ProductController implements the CRUD actions for Product model.
@@ -26,7 +31,7 @@ class ProductController extends Controller
                     'class' => AccessControl::class,
                     'rules' => [
                         [
-                            'actions' => ['index', 'view', 'update', 'create', 'delete'],
+                            'actions' => ['index', 'view', 'update', 'create', 'delete', 'image', 'image-upload'],
                             'allow' => true,
                             'roles' => ['@'],
                         ],
@@ -36,6 +41,7 @@ class ProductController extends Controller
                     'class' => VerbFilter::className(),
                     'actions' => [
                         'delete' => ['POST'],
+                        'image-upload' => ['POST']
                     ],
                 ],
             ]
@@ -118,6 +124,68 @@ class ProductController extends Controller
             'model' => $model,
         ]);
     }
+
+    /**
+     * Display by Product ID Image an existing Product model.
+     * @param string $product_id Product ID
+     * @return string
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionImage($product_id)
+    {
+        $model = $this->findModel($product_id);
+
+        return $this->render('image', [
+            'model' => $model
+        ]);
+
+    }
+
+    /**
+     * Upload Dropzone by Product ID Images an existing Product model.
+     * @param string $product_id Product ID
+     * @return string
+     */
+    public function actionImageUpload($product_id){
+
+        $productImage = new ProductImage();
+
+        $productImage->file = UploadedFile::getInstancesByName('file');
+
+        if($productImage->file){
+                foreach ($productImage->file as $file){
+
+                    $thumbnailPath = Yii::getAlias('@frontend/web/storage/product/thumbs/'.$file->baseName.'-'.$product_id.'.'.$file->extension);
+                    if(!is_dir(dirname($thumbnailPath))){
+                        FileHelper::createDirectory(dirname($thumbnailPath));
+                    }
+
+                    $productImage = new ProductImage();
+                    $productImage->product_id = $product_id;
+                    $productImage->img_url = $file->baseName.'-'.$product_id.'.'.$file->extension;
+                    $productImage->rank = 0;
+                    $productImage->isCover = 0;
+                    $productImage->isActive = 1;
+                    //$productImage->created_at = time();
+                    //$productImage->updated_at = time();
+                    $productImage->created_by = Yii::$app->user->id;
+                    $productImage->updated_by = Yii::$app->user->id;
+
+                    if($productImage->save(false)){
+                        $file->saveAs($thumbnailPath);
+                    }
+                    else{
+                        return 'Upload Error!';
+                    }
+                }
+            return 'Upload Successfully and Save Database';
+        }
+        else{
+            return 'File is does not exist';
+        }
+
+    }
+
 
     /**
      * Deletes an existing Product model.

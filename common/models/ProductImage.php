@@ -5,35 +5,42 @@ namespace common\models;
 use Yii;
 use yii\behaviors\BlameableBehavior;
 use yii\behaviors\TimestampBehavior;
+use yii\web\UploadedFile;
 
 /**
- * This is the model class for table "{{%products}}".
+ * This is the model class for table "{{%product_images}}".
  *
+ * @property int $id
  * @property string $product_id
- * @property string $title
- * @property string|null $description
+ * @property string|null $img_url
  * @property int|null $rank
  * @property int $isActive
+ * @property int $isCover
  * @property int|null $created_at
  * @property int|null $updated_at
  * @property int|null $created_by
  * @property int|null $updated_by
  *
  * @property User $createdBy
+ * @property Product $product
  * @property User $updatedBy
  */
-class Product extends \yii\db\ActiveRecord
+class ProductImage extends \yii\db\ActiveRecord
 {
+    /** @var UploadedFile[]
+     */
+    public $file;
 
-    const STATUS_DRAFT = 0;
-    const STATUS_PUBLISHED = 1;
-
+    /**
+     * @var UploadedFile
+     */
+    public $thumbnail;
     /**
      * {@inheritdoc}
      */
     public static function tableName()
     {
-        return '{{%products}}';
+        return '{{%product_images}}';
     }
 
     public function behaviors()
@@ -53,15 +60,13 @@ class Product extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['product_id', 'title', 'isActive'], 'required'],
-            [['description'], 'string'],
-            [['rank', 'isActive', 'created_at', 'updated_at', 'created_by', 'updated_by'], 'integer'],
+            [['product_id', 'isActive', 'isCover'], 'required'],
+            [['rank', 'isActive', 'isCover', 'created_at', 'updated_at', 'created_by', 'updated_by'], 'integer'],
             [['product_id'], 'string', 'max' => 16],
-            [['title'], 'string', 'max' => 255],
-            [['product_id'], 'unique'],
-            ['rank', 'default', 'value' => 0],
-            ['isActive', 'default', 'value' => self::STATUS_DRAFT],
+            [['img_url'], 'string', 'max' => 255],
             [['created_by'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['created_by' => 'id']],
+            [['product_id'], 'exist', 'skipOnError' => true, 'targetClass' => Product::className(), 'targetAttribute' => ['product_id' => 'product_id']],
+            [['updated_by'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['updated_by' => 'id']],
         ];
     }
 
@@ -71,24 +76,17 @@ class Product extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
+            'id' => 'ID',
             'product_id' => 'Product ID',
-            'title' => 'Title',
-            'description' => 'Description',
+            'img_url' => 'Img Url',
             'rank' => 'Rank',
             'isActive' => 'Is Active',
+            'isCover' => 'Is Cover',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
             'created_by' => 'Created By',
             'updated_by' => 'Updated By',
         ];
-    }
-
-    public function getStatusLabels(){
-        return [
-            self::STATUS_DRAFT => 'Draft',
-            self::STATUS_PUBLISHED => 'Published',
-        ];
-
     }
 
     /**
@@ -99,6 +97,16 @@ class Product extends \yii\db\ActiveRecord
     public function getCreatedBy()
     {
         return $this->hasOne(User::className(), ['id' => 'created_by']);
+    }
+
+    /**
+     * Gets query for [[Product]].
+     *
+     * @return \yii\db\ActiveQuery|\common\models\query\ProductQuery
+     */
+    public function getProduct()
+    {
+        return $this->hasOne(Product::className(), ['product_id' => 'product_id']);
     }
 
     /**
@@ -113,38 +121,10 @@ class Product extends \yii\db\ActiveRecord
 
     /**
      * {@inheritdoc}
-     * @return \common\models\query\ProductQuery the active query used by this AR class.
+     * @return \common\models\query\ProductImageQuery the active query used by this AR class.
      */
     public static function find()
     {
-        return new \common\models\query\ProductQuery(get_called_class());
-    }
-
-    /**
-     * Finds product by product_id
-     *
-     * @param string $product_id
-     * @return static|null
-     */
-    public function findByProductId($product_id)
-    {
-        return static::findOne(['product_id' => $product_id]);
-    }
-
-    public function save($runValidation = true, $attributeNames = null)
-    {
-        $isInsert = $this->isNewRecord;
-
-        if($isInsert){
-            $this->product_id = Yii::$app->security->generateRandomString(8);
-            //$this->title = $this->title;
-        }
-
-        $saved = parent::save($runValidation, $attributeNames);
-        if(!$saved){
-            return false;
-        }
-
-        return true;
+        return new \common\models\query\ProductImageQuery(get_called_class());
     }
 }

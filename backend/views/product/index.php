@@ -75,7 +75,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         ]);
                     },
                     'product_images' => function ($url, $model, $key) {
-                        return Html::a('<i class="fa fa-image"></i>', ['product_image', 'product_id' => $model->product_id],
+                        return Html::a('<i class="fa fa-image"></i>', ['image', 'product_id' => $model->product_id],
                             ['title' => 'Product Images', 'class' => 'btn btn-sm btn-dark']
                         );
                     },
