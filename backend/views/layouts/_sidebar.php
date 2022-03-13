@@ -4,6 +4,7 @@
  * Date: 24.02.2022
  * Time: 14:57
  */
+
 ?>
 
 <aside id="menubar" class="menubar light">
@@ -96,14 +97,40 @@
                     </a>
                 </li>
 
-                <li <?= (Yii::$app->controller->id === 'product') ? 'class="active"' : '' ?>>
-                    <a href="<?= \yii\helpers\Url::to(['product/index']) ?>">
+<!--                <li <?/*= (Yii::$app->controller->id === 'product') ? 'class="active"' : '' */?>>
+                    <a href="<?/*= \yii\helpers\Url::to(['product/index']) */?>">
                         <i class="menu-icon fa fa-cubes"></i>
-                        <span class="menu-text">Ürünler</span>
-                       <!-- <?php /*if((getCountTable("products")) > 0) { */?>
-                            <span class="label label-warning menu-label"><?php /*echo getCountTable("products"); */?></span>
-                        --><?php /*} */?>
+                        <span class="menu-text">Products</span>
+                        <?php /*if(( $productCount = \common\models\Product::find()->count()) > 0): */?>
+                            <span class="label label-warning menu-label"><?php /*echo $productCount */?></span>
+                        <?php /*endif; */?>
                     </a>
+                </li>
+-->
+                <li class="has-submenu <?= (Yii::$app->controller->id === 'product-categories' ? 'active' : '' || Yii::$app->controller->id ==='product') ? 'open' : '' ?>">
+                    <a href="javascript:void(0)" class="submenu-toggle">
+                        <i class="menu-icon fa fa-cubes"></i>
+                        <span class="menu-text">Product Management</span>
+                        <i class="menu-caret zmdi zmdi-hc-sm zmdi-chevron-right"></i>
+                    </a>
+                    <ul class="submenu" style="<?= (Yii::$app->controller->id === 'product-categories' || Yii::$app->controller->id ==='product') ? 'display:block;' : '' ?>">
+                        <li class="<?=(Yii::$app->controller->id ==='product-categories')?'active':''?>">
+                            <a href="<?= \yii\helpers\Url::to(['product-categories/index']) ?>">
+                                <span class="menu-text">Product Categories</span>
+                                <?php if(( $productCategoriesCount = \common\models\ProductCategories::find()->count('category_id')) > 0): ?>
+                                    <span class="label label-success menu-label"><?php echo $productCategoriesCount ?></span>
+                                <?php endif; ?>
+                            </a>
+                        </li>
+                        <li class="<?=(Yii::$app->controller->id ==='product')?'active':''?>">
+                            <a href="<?= \yii\helpers\Url::to(['product/index']) ?>">
+                                <span class="menu-text">Products</span>
+                                <?php if(( $productCount = \common\models\Product::find()->count('product_id')) > 0): ?>
+                                    <span class="label label-danger menu-label"><?php echo $productCount ?></span>
+                                <?php endif; ?>
+                            </a>
+                        </li>
+                    </ul>
                 </li>
 
                 <li <?= (Yii::$app->controller->id === 'services') ? 'class="active"' : '' ?>>

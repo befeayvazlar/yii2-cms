@@ -5,6 +5,7 @@ namespace common\models;
 use Yii;
 use yii\behaviors\BlameableBehavior;
 use yii\behaviors\TimestampBehavior;
+use yii\helpers\FileHelper;
 use yii\web\UploadedFile;
 
 /**
@@ -64,6 +65,7 @@ class ProductImage extends \yii\db\ActiveRecord
             [['rank', 'isActive', 'isCover', 'created_at', 'updated_at', 'created_by', 'updated_by'], 'integer'],
             [['product_id'], 'string', 'max' => 16],
             [['img_url'], 'string', 'max' => 255],
+            [['file'], 'file', 'skipOnEmpty' => false, 'extensions' => 'png, jpg'],
             [['created_by'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['created_by' => 'id']],
             [['product_id'], 'exist', 'skipOnError' => true, 'targetClass' => Product::className(), 'targetAttribute' => ['product_id' => 'product_id']],
             [['updated_by'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['updated_by' => 'id']],
@@ -119,6 +121,33 @@ class ProductImage extends \yii\db\ActiveRecord
         return $this->hasOne(User::className(), ['id' => 'updated_by']);
     }
 
+    public function getThumbnailLink(){
+
+        return self::formatThumbnailLink($this->img_url);
+
+    }
+
+    public static function formatThumbnailLink($img_url){
+
+        if($img_url){
+            return Yii::$app->params['frontendUrl'].'storage/product/thumbs/'.$img_url;
+        }
+
+        return Yii::$app->params['frontendUrl'].'storage/img/no_image.png';
+
+    }
+
+    /** $size string */
+    public function getImageLink($size='thumbs', $img_url){
+
+        if($img_url){
+            return Yii::$app->params['frontendUrl'].'storage/product/'.$size.'/'.$img_url;
+        }
+
+        return Yii::$app->params['frontendUrl'].'storage/img/no_image.png';
+
+    }
+
     /**
      * {@inheritdoc}
      * @return \common\models\query\ProductImageQuery the active query used by this AR class.
@@ -127,4 +156,28 @@ class ProductImage extends \yii\db\ActiveRecord
     {
         return new \common\models\query\ProductImageQuery(get_called_class());
     }
+
+    /**
+     */
+    /*public function afterDelete()
+    {
+        parent::afterDelete();
+
+        $size = [
+            'thumbs' => 'thumbs',
+            '342x215' => '342x215',
+            '1080x426' => '1080x426'
+        ];
+
+        if($this->img_url){
+            $thumbsDir = Yii::getAlias('@frontend/web/storage/product/'.$size['thumbs'].'/'). dirname($this->img_url);
+            FileHelper::removeDirectory($thumbsDir);
+
+            $img342x215_Dir = Yii::getAlias('@frontend/web/storage/product/'.$size['342x215'].'/'). dirname($this->img_url);
+            FileHelper::removeDirectory($img342x215_Dir);
+
+            $img1080x426_Dir = Yii::getAlias('@frontend/web/storage/product/'.$size['1080x426'].'/'). dirname($this->img_url);
+            FileHelper::removeDirectory($img1080x426_Dir);
+        }
+    }*/
 }

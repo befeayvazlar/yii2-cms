@@ -31,4 +31,11 @@ class ProductImageQuery extends \yii\db\ActiveQuery
     {
         return parent::one($db);
     }
+
+    public function isNotActiveCover($id, $product_id){
+
+        return $this->andWhere([['id' => $id]], ['product_id' => $product_id]);
+
+    }
+
 }

@@ -2,6 +2,7 @@
 
 namespace backend\models\search;
 
+use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use common\models\Product;
@@ -38,14 +39,18 @@ class ProductSearch extends Product
      *
      * @return ActiveDataProvider
      */
-    public function search($params)
+    public function search($params, $pageSize)
     {
         $query = Product::find();
 
         // add conditions that should always apply here
 
+
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'pagination' => [
+                'pageSize' => $pageSize  // no pagination if it is 0
+            ]
         ]);
 
         $this->load($params);
@@ -68,7 +73,12 @@ class ProductSearch extends Product
 
         $query->andFilterWhere(['like', 'product_id', $this->product_id])
             ->andFilterWhere(['like', 'title', $this->title])
-            ->andFilterWhere(['like', 'description', $this->description]);
+            ->andFilterWhere(['like', 'description', $this->description])
+            ->andFilterWhere([
+                'like',
+                'FROM_UNIXTIME(created_at, "%d/%m/%Y")',
+                $this->created_at
+            ]);
 
         return $dataProvider;
     }

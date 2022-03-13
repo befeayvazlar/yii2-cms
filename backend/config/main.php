@@ -56,6 +56,7 @@ return [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
+                'product/update/<product_id>' => 'product/update'
             ],
         ],
 

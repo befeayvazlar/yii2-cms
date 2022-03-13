@@ -7,7 +7,8 @@
 
 $session = Yii::$app->session;
 
-$alert = $session->get('alert');
+//$alert = $session->get('success');
+$alert = $session->getFlash('success');
 
 if($alert){
 
@@ -16,7 +17,7 @@ if($alert){
         <script>
             iziToast.success({
                 title: '<?php echo $alert["title"]; ?>',
-                message: '<?php echo $alert["text"]; ?>',
+                message: '<?php echo $alert["message"]; ?>',
                 position : "topCenter"
             })
         </script>
@@ -26,7 +27,7 @@ if($alert){
         <script>
             iziToast.error({
                 title: '<?php echo $alert["title"]; ?>',
-                message: '<?php echo $alert["text"]; ?>',
+                message: '<?php echo $alert["message"]; ?>',
                 position : "topCenter"
             })
         </script>
@@ -34,7 +35,8 @@ if($alert){
     <?php }
 }
 
-$session->remove('alert');
+//$session->remove('success');
+$session->removeFlash('success');
 
 ?>
 

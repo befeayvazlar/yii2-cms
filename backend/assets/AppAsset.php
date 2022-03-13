@@ -23,9 +23,11 @@ class AppAsset extends AssetBundle
         'css/core.css',
         'css/misc-pages.css',
         'css/bootstrap4-validation.css',
-        'css/app.css',
+        'css/app.min.css',
+        'css/custom.css',
+        'libs/izitoast/dist/css/iziToast.min.css',
         /** endbuild */
-        'https://fonts.googleapis.com/css?family=Raleway:400,500,600,700,800,900,300'
+        'https://fonts.googleapis.com/css?family=Roboto:400,500,600,700,800,900,300'
     ];
     public $js = [
         /** build:js ../assets/js/core.min.js */
@@ -41,6 +43,8 @@ class AppAsset extends AssetBundle
         'js/library.js',
         'js/plugins.js',
         'js/app.js',
+        /** Custom Js */
+        //'js/custom.js',
         /** endbuild */
         'libs/bower/moment/moment.js',
         'libs/bower/fullcalendar/dist/fullcalendar.min.js',

@@ -1,0 +1,35 @@
+body{font-family:Roboto,"Helvetica Neue",Helvetica,Arial,sans-serif;font-size:14px;line-height:1.428571429;color:#6a6c6f}
+.tooltip{font-family:Roboto,"Helvetica Neue",Helvetica,Arial,sans-serif;font-style:normal;font-weight:400;letter-spacing:normal;line-break:auto;line-height:1.428571429;text-shadow:none;text-transform:none;white-space:normal;word-break:normal;word-spacing:normal;word-wrap:normal;text-decoration:none}
+.td-actions{
+    white-space: nowrap;
+}
+.table th {
+    white-space: nowrap;
+}
+
+table th a.desc:after,
+table th a.asc:after{
+    -webkit-font-smoothing: antialiased;
+    display: inline-block;
+    font-style: normal;
+    font-variant: normal;
+    text-rendering: auto;
+    line-height: 1;
+    font-family: "FontAwesome", sans-serif;
+    font-weight: 500;
+    margin-left: 8px;
+}
+table th a.desc:after {
+    content: "\f078";
+}
+
+table th a.asc:after {
+    content: "\f077";
+}
+
+.app-menu .menu-label {
+    float: right;
+    padding: 0.4em 0.8em 0.2em;
+}
+
+.note-editor{margin-bottom:0;}
