@@ -2,15 +2,14 @@
 
 namespace backend\models\search;
 
-use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use common\models\Product;
+use common\models\ProductCategories;
 
 /**
- * ProductSearch represents the model behind the search form of `common\models\Product`.
+ * ProductCategoriesSearch represents the model behind the search form of `common\models\ProductCategories`.
  */
-class ProductSearch extends Product
+class ProductCategoriesSearch extends ProductCategories
 {
     /**
      * {@inheritdoc}
@@ -18,9 +17,9 @@ class ProductSearch extends Product
     public function rules()
     {
         return [
-            [['product_id', 'title', 'description'], 'safe'],
-            [['rank', 'isActive', 'category_id', 'updated_at', 'created_by', 'updated_by'], 'integer'],
-            [['created_at'], 'string']
+            [['category_id', 'isActive', 'created_by', 'updated_by'], 'integer'],
+            [['title'], 'safe'],
+            [['created_at', 'updated_at'], 'string']
         ];
     }
 
@@ -40,18 +39,14 @@ class ProductSearch extends Product
      *
      * @return ActiveDataProvider
      */
-    public function search($params, $pageSize)
+    public function search($params)
     {
-        $query = Product::find()->with('categoryId');
+        $query = ProductCategories::find();
 
         // add conditions that should always apply here
 
-
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-            'pagination' => [
-                'pageSize' => $pageSize  // no pagination if it is 0
-            ]
         ]);
 
         $this->load($params);
@@ -64,22 +59,24 @@ class ProductSearch extends Product
 
         // grid filtering conditions
         $query->andFilterWhere([
-            'rank' => $this->rank,
-            'isActive' => $this->isActive,
             'category_id' => $this->category_id,
+            'isActive' => $this->isActive,
             //'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+            //'updated_at' => $this->updated_at,
             'created_by' => $this->created_by,
             'updated_by' => $this->updated_by,
         ]);
 
-        $query->andFilterWhere(['like', 'product_id', $this->product_id])
-            ->andFilterWhere(['like', 'title', $this->title])
-            ->andFilterWhere(['like', 'description', $this->description])
+        $query->andFilterWhere(['like', 'title', $this->title])
             ->andFilterWhere([
                 'like',
                 'FROM_UNIXTIME(created_at, "%d/%m/%Y")',
                 $this->created_at
+            ])
+            ->andFilterWhere([
+                'like',
+                'FROM_UNIXTIME(updated_at, "%d/%m/%Y")',
+                $this->updated_at
             ]);
 
         return $dataProvider;

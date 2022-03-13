@@ -6,6 +6,7 @@ use common\models\LoginForm;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
+use yii\helpers\Html;
 use yii\web\Controller;
 use yii\web\Response;
 
@@ -80,6 +81,13 @@ class SiteController extends Controller
 
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
+
+            Yii::$app->getSession()->setFlash('success',[
+                'type' => 'success',
+                'message' => Html::encode('Welcome '. Yii::$app->user->identity->fullname),
+                'title' => Html::encode('Login Successfully'),
+            ]);
+
             return $this->goBack();
         }
 
